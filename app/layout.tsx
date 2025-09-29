@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/lib/LanguageContext";
 export const metadata: Metadata = {
   title: "Guinea E‑Visa Portal",
   description: "Apply for your Guinea e‑visa quickly and securely.",
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

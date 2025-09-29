@@ -8,13 +8,29 @@ export default function ForgotPasswordPage() {
   const supabase = createClient()
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (sending) return
+    setSending(true)
     const origin = window.location.origin
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/auth/update-password` })
-    if (error) setMessage(error.message)
-    else setMessage('Check your email for a password reset link.')
+    try {
+      const res = await fetch('/api/auth/send-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, siteOrigin: origin }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        setMessage(j.error || 'Failed to send reset email')
+      } else {
+        const j = await res.json().catch(() => ({}))
+        setMessage(j.id ? 'Email sent.' : 'Check your email for a password reset link.')
+      }
+    } finally {
+      setTimeout(() => setSending(false), 1200)
+    }
   }
 
   return (
@@ -24,7 +40,7 @@ export default function ForgotPasswordPage() {
           <label className="block text-sm font-medium">Email</label>
           <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"/>
         </div>
-        <button className="btn bg-guinea-green text-white w-full">Send reset link</button>
+        <button disabled={sending} className="btn bg-guinea-green text-white w-full">{sending ? 'Sending...' : 'Send reset link'}</button>
         {message && <p className="text-sm">{message}</p>}
       </form>
     </AuthCard>

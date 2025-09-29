@@ -18,16 +18,16 @@ export default function SignUpPage() {
     setLoading(true)
     setMessage(null)
     const origin = window.location.origin
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/confirm`,
-        data: { full_name: name }
-      }
+    const res = await fetch('/api/auth/send-confirmation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, full_name: name, siteOrigin: origin }),
     })
     setLoading(false)
-    if (error) return setMessage(error.message)
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}))
+      return setMessage(j.error || 'Failed to send confirmation email')
+    }
     setMessage('Check your email to confirm your account before signing in.')
   }
 
