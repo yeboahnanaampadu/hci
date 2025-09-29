@@ -11,18 +11,48 @@ export default function SignInPage() {
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false)
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMessage(null)
+    setEmailNotConfirmed(false)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (error) {
-      setMessage(error.message)
+      if (error.message.includes('Email not confirmed') || error.message.includes('email not confirmed')) {
+        setEmailNotConfirmed(true)
+      } else {
+        setMessage(error.message)
+      }
     } else {
       window.location.href = '/dashboard'
     }
+  }
+
+  const resendConfirmation = async () => {
+    if (!email) return
+    setResendLoading(true)
+    setMessage(null)
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/confirm`
+        }
+      })
+      if (error) {
+        setMessage(error.message)
+      } else {
+        setMessage('Confirmation email sent! Please check your inbox.')
+      }
+    } catch (err: any) {
+      setMessage('Failed to send confirmation email')
+    }
+    setResendLoading(false)
   }
 
   return (
@@ -41,6 +71,18 @@ export default function SignInPage() {
           <Link className="text-guinea-green font-medium" href="/auth/forgot-password">Forgot password?</Link>
           <Link className="text-gray-700" href="/auth/sign-up">Create an account</Link>
         </div>
+        {emailNotConfirmed && (
+          <p className="text-sm text-red-600">
+            Email not confirmed.{' '}
+            <button
+              onClick={resendConfirmation}
+              disabled={resendLoading}
+              className="text-guinea-green font-medium hover:underline disabled:opacity-50"
+            >
+              {resendLoading ? 'Sending...' : 'Resend email'}
+            </button>
+          </p>
+        )}
         {message && <p className="text-sm text-red-600">{message}</p>}
       </form>
     </AuthCard>
