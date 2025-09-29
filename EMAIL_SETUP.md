@@ -1,29 +1,26 @@
 # Email Setup Guide
 
-## Issue: Emails Not Being Sent
+## Email Configuration
 
-The application uses Resend for sending emails. If emails are not being sent, it's likely due to domain verification requirements.
+The application uses Supabase Auth for sending emails. Emails are sent automatically when users sign up or request password resets.
 
-### Problem
-Resend accounts in testing mode can only send emails to the account owner's verified email address. To send to other recipients, you must verify a domain.
+### Setup Required
+1. **Configure SMTP in Supabase Dashboard:**
+   - Go to your Supabase project → Authentication → Providers → Email
+   - Configure SMTP settings with your email provider
+   - Ensure "Confirm email" is enabled
 
-### Solution
-1. Go to [resend.com/domains](https://resend.com/domains)
-2. Add and verify your domain (e.g., guinea-evisa.com)
-3. Update `.env.local`:
-   ```
-   EMAIL_FROM=noreply@yourdomain.com
-   ```
-4. Replace `yourdomain.com` with your verified domain
+2. **Custom Email Templates (Optional):**
+   - In Supabase dashboard, you can customize email templates
+   - Update the subject and content to include "Guinea E-Visa" branding
+   - Example subject: "Guinea E-Visa - Confirm your email"
 
-### Testing
-For local development, you can temporarily modify the email routes to send to your own email address, or upgrade your Resend plan for more testing emails.
+### Current Implementation
+- ✅ User registration: Supabase sends confirmation emails automatically
+- ✅ Password reset: Supabase sends recovery emails automatically
+- ✅ Custom redirect URLs configured for proper user flow
 
-### Current Status
-- ✅ Resend API key configured
-- ✅ Email sending code implemented with retry logic
-- ✅ Testing mode workaround: emails sent to owner (yeboahnanaampadu@gmail.com)
-- ❌ Domain verification needed for production emails
-
-### Testing Mode Behavior
-Until domain verification is complete, all emails are sent to the account owner's email address with details about the intended recipient. This allows testing without domain verification.
+### Email Flow
+1. User signs up → Supabase creates user with `email_confirm: false` → Sends confirmation email
+2. User requests password reset → API generates recovery link → Supabase sends reset email
+3. Emails contain links that redirect to the appropriate auth pages

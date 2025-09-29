@@ -19,12 +19,16 @@ npm run dev
 ### Supabase setup
 
 1. Create a new Supabase project and configure SMTP in **Authentication → Providers → Email**. Ensure *Confirm email* is **enabled** so unconfirmed users cannot sign in.
-2. In the SQL editor, paste and run the contents of `supabase/schema.sql`.
-3. Set **Auth Redirect URLs** to include:
-   - `http://localhost:3000/auth/confirm`
-   - `http://localhost:3000/auth/update-password`
-   - Your production URLs as well.
-4. Create a Storage bucket (optional) named `documents` for file uploads later, and set RLS policies.
+2. **Customize email templates** with "Guinea E-Visa" branding:
+   - Go to Authentication → Email Templates
+   - Update subjects to include "Guinea E-Visa" (e.g., "Guinea E-Visa - Confirm your email")
+   - Customize email content as needed
+3. In the SQL editor, paste and run the contents of `supabase/schema.sql`.
+4. Set **Auth Redirect URLs** to include:
+    - `http://localhost:3000/auth/confirm`
+    - `http://localhost:3000/auth/update-password`
+    - Your production URLs as well.
+5. Create a Storage bucket (optional) named `documents` for file uploads later, and set RLS policies.
 
 ### App routes
 

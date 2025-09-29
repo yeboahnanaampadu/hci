@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { getDefaultFromEmail, getResend, getOwnerEmail } from '@/lib/email/resend'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,88 +8,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // 1) Create the user (email not confirmed)
+    // Create the user - Supabase will automatically send confirmation email if SMTP is configured
     const supabaseAdmin = getSupabaseAdmin()
     const { data: userCreate, error: createErr } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: false,
+      email_confirm: false, // Will send confirmation email
       user_metadata: full_name ? { full_name } : undefined,
     })
     if (createErr) return NextResponse.json({ error: createErr.message }, { status: 400 })
 
-    const userId = userCreate.user.id
-
-    // 2) Generate a magic link for email confirmation
-    const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'signup',
-      email,
-      password,
-      options: {
-        redirectTo: `${siteOrigin}/auth/confirm`,
-      },
-    })
-    if (linkErr) return NextResponse.json({ error: linkErr.message }, { status: 400 })
-
-    const confirmUrl = linkData.properties.action_link
-
-    // 3) Send email via Resend
-    const from = getDefaultFromEmail()
-    const resend = getResend()
-    const ownerEmail = getOwnerEmail()
-    let attempt = 0
-    let lastError: any = null
-    while (attempt < 3) {
-      const sendResult = await resend.emails.send({
-        from,
-        to: ownerEmail,
-        subject: 'Guinea E‑Visa – Email Confirmation Request',
-        html: `
-          <p><strong>TESTING MODE:</strong> A new account was created for: <strong>${email}</strong>${full_name ? ` (${full_name})` : ''}</p>
-          <p>Please use this link to confirm the email:</p>
-          <p><a href="${confirmUrl}">${confirmUrl}</a></p>
-          <p>This email was sent to you because your Resend account is in testing mode.</p>
-          <p>In production, this would be sent directly to the user.</p>
-          <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
-          <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service (Testing Mode)</p>
-        `,
-      })
-      if (!(sendResult as any).error) {
-        return NextResponse.json({ ok: true, userId, id: (sendResult as any).data?.id })
-      }
-      const err = (sendResult as any).error
-      lastError = err
-      console.error('Resend send error:', err)
-      if (attempt === 0) {
-        const fallback = await resend.emails.send({
-          from: 'onboarding@resend.dev',
-          to: ownerEmail,
-          subject: 'Guinea E‑Visa – Email Confirmation Request (Fallback)',
-          html: `
-            <p><strong>TESTING MODE:</strong> A new account was created for: <strong>${email}</strong>${full_name ? ` (${full_name})` : ''}</p>
-            <p>Please use this link to confirm the email:</p>
-            <p><a href="${confirmUrl}">${confirmUrl}</a></p>
-            <p>This email was sent to you because your Resend account is in testing mode.</p>
-            <p>In production, this would be sent directly to the user.</p>
-            <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
-            <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service (Testing Mode)</p>
-          `,
-        })
-        if (!(fallback as any).error) {
-          return NextResponse.json({ ok: true, userId, id: (fallback as any).data?.id, fallbackSender: true })
-        }
-      }
-      if (err?.statusCode === 429 || err?.name === 'rate_limit_exceeded') {
-        await new Promise(r => setTimeout(r, 600 * (attempt + 1)))
-        attempt++
-        continue
-      }
-      break
-    }
-    if (lastError?.statusCode === 429 || lastError?.name === 'rate_limit_exceeded') {
-      return NextResponse.json({ error: 'Rate limited by email provider. Please try again shortly.' }, { status: 429 })
-    }
-    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+    return NextResponse.json({ ok: true, userId: userCreate.user.id })
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Unexpected error' }, { status: 500 })
   }
