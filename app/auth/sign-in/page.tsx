@@ -83,7 +83,11 @@ export default function SignInPage() {
             </button>
           </p>
         )}
-        {message && <p className="text-sm text-red-600">{message}</p>}
+        {message && (
+          <p className={`text-sm ${emailNotConfirmed && message?.includes('Confirmation email sent') ? 'text-gray-700' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
       </form>
     </AuthCard>
   )

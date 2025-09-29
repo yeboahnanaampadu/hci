@@ -27,7 +27,7 @@ npm run dev
 4. Set **Auth Redirect URLs** to include:
     - `http://localhost:3000/auth/confirm`
     - `http://localhost:3000/auth/update-password`
-    - Your production URLs as well.
+    - Your production URLs as well (e.g., `https://yourdomain.com/auth/confirm`)
 5. Create a Storage bucket (optional) named `documents` for file uploads later, and set RLS policies.
 
 ### App routes
