@@ -43,12 +43,14 @@ export async function POST(req: NextRequest) {
       const sendResult = await resend.emails.send({
         from,
         to: email,
-        subject: 'Confirm your Guinea E‑Visa account',
+        subject: 'Guinea E‑Visa – Confirm your email',
         html: `
           <p>Hello${full_name ? ` ${full_name}` : ''},</p>
-          <p>Confirm your email to activate your account:</p>
+          <p>Please confirm your email to activate your Guinea E‑Visa account.</p>
           <p><a href="${confirmUrl}">${confirmUrl}</a></p>
-          <p>If you did not request this, you can ignore this email.</p>
+          <p>If you did not request this, you can safely ignore this message.</p>
+          <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
+          <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
         `,
       })
       if (!(sendResult as any).error) {
@@ -61,12 +63,14 @@ export async function POST(req: NextRequest) {
         const fallback = await resend.emails.send({
           from: 'Guinea E‑Visa <onboarding@resend.dev>',
           to: email,
-          subject: 'Confirm your Guinea E‑Visa account',
+          subject: 'Guinea E‑Visa – Confirm your email',
           html: `
             <p>Hello${full_name ? ` ${full_name}` : ''},</p>
-            <p>Confirm your email to activate your account:</p>
+            <p>Please confirm your email to activate your Guinea E‑Visa account.</p>
             <p><a href="${confirmUrl}">${confirmUrl}</a></p>
-            <p>If you did not request this, you can ignore this email.</p>
+            <p>If you did not request this, you can safely ignore this message.</p>
+            <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
+            <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
           `,
         })
         if (!(fallback as any).error) {

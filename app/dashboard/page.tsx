@@ -95,33 +95,33 @@ export default function DashboardPage() {
 
   return (
     <main className="container-prose my-10">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-2xl font-bold">{t[language].welcome}, {user.user_metadata?.full_name || 'Applicant'}</h1>
-        <form action="/auth/sign-out" method="post">
-          <button className="btn border border-gray-300">{t[language].signOut}</button>
+        <form action="/auth/sign-out" method="post" className="sm:ml-auto">
+          <button className="btn border border-gray-300 w-full sm:w-auto">{t[language].signOut}</button>
         </form>
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-6">
         <div className="card md:col-span-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 className="font-semibold">{t[language].recentApps}</h2>
-            <Link href="/dashboard/start" className="btn bg-guinea-green text-white">{t[language].newApp}</Link>
+            <Link href="/dashboard/start" className="btn bg-guinea-green text-white w-full sm:w-auto">{t[language].newApp}</Link>
           </div>
           <div className="mt-4 divide-y">
             {applications.length === 0 && <p className="text-sm text-gray-600">{t[language].noApps}</p>}
             {applications.map((a:any) => (
-              <div key={a.id} className="py-3 flex items-center justify-between text-sm">
-                <div>
+              <div key={a.id} className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+                <div className="min-w-0">
                   <p className="font-medium">{a.reference_number}</p>
-                  <p className="text-gray-600">{t[language].type}: {a.visa_type} • {t[language].submitted} {new Date(a.created_at).toLocaleDateString()}</p>
+                  <p className="text-gray-600 break-words">{t[language].type}: {a.visa_type} • {t[language].submitted} {new Date(a.created_at).toLocaleDateString()}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className={`px-2.5 py-1 rounded-full text-xs ${a.status === 'payment_pending' ? 'bg-yellow-100 text-yellow-800' : a.status === 'submitted' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'}`}>
                     {a.status === 'payment_pending' ? 'Pending Payment' : a.status === 'submitted' ? 'Submitted' : a.status.charAt(0).toUpperCase() + a.status.slice(1).replace('_', ' ')}
                   </span>
                   {a.status === 'payment_pending' ? (
-                    <Link href={`/payment?id=${a.id}`} className="btn bg-green-600 text-white text-xs">Pay Now</Link>
+                    <Link href={`/payment?id=${a.id}`} className="btn bg-green-600 text-white text-xs w-full sm:w-auto text-center">Pay Now</Link>
                   ) : (
                     <button onClick={() => setCanceling(a.id)} className="text-red-600 text-xs">{t[language].cancel}</button>
                   )}

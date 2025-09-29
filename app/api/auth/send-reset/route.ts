@@ -31,11 +31,13 @@ export async function POST(req: NextRequest) {
       const sendResult = await resend.emails.send({
         from: getDefaultFromEmail(),
         to: email,
-        subject: 'Reset your Guinea E‑Visa password',
+        subject: 'Guinea E‑Visa – Reset your password',
         html: `
-          <p>Click the link below to reset your password:</p>
+          <p>You requested a password reset for your Guinea E‑Visa account.</p>
           <p><a href="${resetUrl}">${resetUrl}</a></p>
           <p>If you did not request this, you can ignore this email.</p>
+          <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
+          <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
         `,
       })
       if (!(sendResult as any).error) {
@@ -49,11 +51,13 @@ export async function POST(req: NextRequest) {
         const fallback = await resend.emails.send({
           from: 'Guinea E‑Visa <onboarding@resend.dev>',
           to: email,
-          subject: 'Reset your Guinea E‑Visa password',
+          subject: 'Guinea E‑Visa – Reset your password',
           html: `
-            <p>Click the link below to reset your password:</p>
+            <p>You requested a password reset for your Guinea E‑Visa account.</p>
             <p><a href="${resetUrl}">${resetUrl}</a></p>
             <p>If you did not request this, you can ignore this email.</p>
+            <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
+            <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
           `,
         })
         if (!(fallback as any).error) {
