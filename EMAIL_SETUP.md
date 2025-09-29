@@ -7,13 +7,17 @@ The application uses Supabase Auth for sending emails. Emails are sent automatic
 ### Setup Required
 1. **Configure SMTP in Supabase Dashboard:**
    - Go to your Supabase project → Authentication → Providers → Email
-   - Configure SMTP settings with your email provider
+   - Configure SMTP settings with your email provider (Gmail, SendGrid, etc.)
    - Ensure "Confirm email" is enabled
+   - **Important**: Without SMTP configuration, no emails will be sent!
 
-2. **Custom Email Templates (Optional):**
-   - In Supabase dashboard, you can customize email templates
-   - Update the subject and content to include "Guinea E-Visa" branding
-   - Example subject: "Guinea E-Visa - Confirm your email"
+2. **Custom Email Templates:**
+   - In Supabase dashboard → Authentication → Email Templates
+   - Update subjects to include "Guinea E-Visa" branding
+   - Example subjects:
+     - "Guinea E-Visa - Confirm your email"
+     - "Guinea E-Visa - Reset your password"
+   - Customize email content as needed
 
 ### Current Implementation
 - ✅ User registration: Supabase sends confirmation emails automatically

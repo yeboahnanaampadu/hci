@@ -3,7 +3,15 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 
+export async function GET() {
+  return handleSignOut()
+}
+
 export async function POST() {
+  return handleSignOut()
+}
+
+async function handleSignOut() {
   const supabase = createClient()
   await supabase.auth.signOut()
 

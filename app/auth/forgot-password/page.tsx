@@ -14,19 +14,14 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     if (sending) return
     setSending(true)
-    const origin = window.location.origin
     try {
-      const res = await fetch('/api/auth/send-reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, siteOrigin: origin }),
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/update-password`,
       })
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}))
-        setMessage(j.error || 'Failed to send reset email')
+      if (error) {
+        setMessage(error.message)
       } else {
-        const j = await res.json().catch(() => ({}))
-        setMessage(j.id ? 'Email sent.' : 'Check your email for a password reset link.')
+        setMessage('Check your email for a password reset link.')
       }
     } finally {
       setTimeout(() => setSending(false), 1200)
