@@ -97,9 +97,16 @@ export default function DashboardPage() {
     <main className="container-prose my-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-2xl font-bold">{t[language].welcome}, {user.user_metadata?.full_name || 'Applicant'}</h1>
-        <form action="/auth/sign-out" method="post" className="sm:ml-auto">
-          <button className="btn border border-gray-300 w-full sm:w-auto">{t[language].signOut}</button>
-        </form>
+        <button
+          onClick={async () => {
+            const supabase = createClient()
+            await supabase.auth.signOut()
+            window.location.href = '/auth/sign-in'
+          }}
+          className="btn border border-gray-300 w-full sm:w-auto"
+        >
+          {t[language].signOut}
+        </button>
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-6">

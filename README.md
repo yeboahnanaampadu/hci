@@ -24,10 +24,14 @@ npm run dev
    - Update subjects to include "Guinea E-Visa" (e.g., "Guinea E-Visa - Confirm your email")
    - Customize email content as needed
 3. In the SQL editor, paste and run the contents of `supabase/schema.sql`.
-4. Set **Auth Redirect URLs** to include:
-    - `http://localhost:3000/auth/confirm`
-    - `http://localhost:3000/auth/update-password`
-    - Your production URLs as well (e.g., `https://yourdomain.com/auth/confirm`)
+4. **CRITICAL: Configure Auth Redirect URLs for production:**
+   - Go to Authentication → URL Configuration
+   - Add these redirect URLs:
+     - `http://localhost:3000/auth/confirm` (for development)
+     - `http://localhost:3000/auth/update-password` (for development)
+     - `https://yourdomain.com/auth/confirm` (for production)
+     - `https://yourdomain.com/auth/update-password` (for production)
+   - **Without these URLs configured, password reset and email confirmation will redirect to broken pages!**
 5. Create a Storage bucket (optional) named `documents` for file uploads later, and set RLS policies.
 
 ### App routes
