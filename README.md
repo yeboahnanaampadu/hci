@@ -24,15 +24,17 @@ npm run dev
    - Update subjects to include "Guinea E-Visa" (e.g., "Guinea E-Visa - Confirm your email")
    - Customize email content as needed
 3. In the SQL editor, paste and run the contents of `supabase/schema.sql`.
-4. **CRITICAL: Configure Auth Redirect URLs**
+4. **CRITICAL: Configure Site URL and Redirect URLs**
    - Go to: **Supabase Dashboard → Your Project → Authentication → URL Configuration**
-   - Set "Site URL" to: `https://hci-sable-six.vercel.app`
-   - Add these EXACT URLs to "Redirect URLs":
+   - **Set Site URL to**: `https://hci-sable-six.vercel.app` (NOT localhost!)
+   - **Add these URLs to "Redirect URLs"**:
      - `http://localhost:3000/auth/confirm` (development)
      - `http://localhost:3000/auth/update-password` (development)
      - `https://hci-sable-six.vercel.app/auth/confirm` (production)
      - `https://hci-sable-six.vercel.app/auth/update-password` (production)
-   - **WITHOUT THESE PRODUCTION URLs, EMAILS WILL REDIRECT TO LOCALHOST AND BREAK!**
+   - **Check Email Templates**: Go to Authentication → Email Templates and ensure no hardcoded localhost URLs
+
+5. **WITHOUT PROPER SITE URL CONFIGURATION, ALL EMAILS WILL REDIRECT TO LOCALHOST!**
 5. Create a Storage bucket (optional) named `documents` for file uploads later, and set RLS policies.
 
 ### App routes
