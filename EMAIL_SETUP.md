@@ -22,4 +22,8 @@ For local development, you can temporarily modify the email routes to send to yo
 ### Current Status
 - ✅ Resend API key configured
 - ✅ Email sending code implemented with retry logic
+- ✅ Testing mode workaround: emails sent to owner (yeboahnanaampadu@gmail.com)
 - ❌ Domain verification needed for production emails
+
+### Testing Mode Behavior
+Until domain verification is complete, all emails are sent to the account owner's email address with details about the intended recipient. This allows testing without domain verification.

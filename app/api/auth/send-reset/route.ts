@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { getDefaultFromEmail, getResend } from '@/lib/email/resend'
+import { getDefaultFromEmail, getResend, getOwnerEmail } from '@/lib/email/resend'
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,19 +25,22 @@ export async function POST(req: NextRequest) {
     const resetUrl = linkData.properties.action_link
 
     const resend = getResend()
+    const ownerEmail = getOwnerEmail()
     let attempt = 0
     let lastError: any = null
     while (attempt < 3) {
       const sendResult = await resend.emails.send({
         from: getDefaultFromEmail(),
-        to: email,
-        subject: 'Guinea E‑Visa – Reset your password',
+        to: ownerEmail,
+        subject: 'Guinea E‑Visa – Password Reset Request',
         html: `
-          <p>You requested a password reset for your Guinea E‑Visa account.</p>
+          <p><strong>TESTING MODE:</strong> A password reset was requested for: <strong>${email}</strong></p>
+          <p>Please use this link to reset the password:</p>
           <p><a href="${resetUrl}">${resetUrl}</a></p>
-          <p>If you did not request this, you can ignore this email.</p>
+          <p>This email was sent to you because your Resend account is in testing mode.</p>
+          <p>In production, this would be sent directly to the user.</p>
           <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
-          <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
+          <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service (Testing Mode)</p>
         `,
       })
       if (!(sendResult as any).error) {
@@ -49,14 +52,16 @@ export async function POST(req: NextRequest) {
       if (attempt === 0) {
         const fallback = await resend.emails.send({
           from: 'onboarding@resend.dev',
-          to: email,
-          subject: 'Guinea E‑Visa – Reset your password',
+          to: ownerEmail,
+          subject: 'Guinea E‑Visa – Password Reset Request (Fallback)',
           html: `
-            <p>You requested a password reset for your Guinea E‑Visa account.</p>
+            <p><strong>TESTING MODE:</strong> A password reset was requested for: <strong>${email}</strong></p>
+            <p>Please use this link to reset the password:</p>
             <p><a href="${resetUrl}">${resetUrl}</a></p>
-            <p>If you did not request this, you can ignore this email.</p>
+            <p>This email was sent to you because your Resend account is in testing mode.</p>
+            <p>In production, this would be sent directly to the user.</p>
             <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
-            <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
+            <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service (Testing Mode)</p>
           `,
         })
         if (!(fallback as any).error) {

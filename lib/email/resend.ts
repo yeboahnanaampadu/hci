@@ -12,4 +12,9 @@ export function getDefaultFromEmail() {
   return email
 }
 
+export function getOwnerEmail() {
+  // For testing mode, send all emails to the owner's verified email
+  return process.env.OWNER_EMAIL || 'yeboahnanaampadu@gmail.com'
+}
+
 

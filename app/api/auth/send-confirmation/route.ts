@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { getDefaultFromEmail, getResend } from '@/lib/email/resend'
+import { getDefaultFromEmail, getResend, getOwnerEmail } from '@/lib/email/resend'
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,20 +37,22 @@ export async function POST(req: NextRequest) {
     // 3) Send email via Resend
     const from = getDefaultFromEmail()
     const resend = getResend()
+    const ownerEmail = getOwnerEmail()
     let attempt = 0
     let lastError: any = null
     while (attempt < 3) {
       const sendResult = await resend.emails.send({
         from,
-        to: email,
-        subject: 'Guinea E‑Visa – Confirm your email',
+        to: ownerEmail,
+        subject: 'Guinea E‑Visa – Email Confirmation Request',
         html: `
-          <p>Hello${full_name ? ` ${full_name}` : ''},</p>
-          <p>Please confirm your email to activate your Guinea E‑Visa account.</p>
+          <p><strong>TESTING MODE:</strong> A new account was created for: <strong>${email}</strong>${full_name ? ` (${full_name})` : ''}</p>
+          <p>Please use this link to confirm the email:</p>
           <p><a href="${confirmUrl}">${confirmUrl}</a></p>
-          <p>If you did not request this, you can safely ignore this message.</p>
+          <p>This email was sent to you because your Resend account is in testing mode.</p>
+          <p>In production, this would be sent directly to the user.</p>
           <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
-          <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
+          <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service (Testing Mode)</p>
         `,
       })
       if (!(sendResult as any).error) {
@@ -62,15 +64,16 @@ export async function POST(req: NextRequest) {
       if (attempt === 0) {
         const fallback = await resend.emails.send({
           from: 'onboarding@resend.dev',
-          to: email,
-          subject: 'Guinea E‑Visa – Confirm your email',
+          to: ownerEmail,
+          subject: 'Guinea E‑Visa – Email Confirmation Request (Fallback)',
           html: `
-            <p>Hello${full_name ? ` ${full_name}` : ''},</p>
-            <p>Please confirm your email to activate your Guinea E‑Visa account.</p>
+            <p><strong>TESTING MODE:</strong> A new account was created for: <strong>${email}</strong>${full_name ? ` (${full_name})` : ''}</p>
+            <p>Please use this link to confirm the email:</p>
             <p><a href="${confirmUrl}">${confirmUrl}</a></p>
-            <p>If you did not request this, you can safely ignore this message.</p>
+            <p>This email was sent to you because your Resend account is in testing mode.</p>
+            <p>In production, this would be sent directly to the user.</p>
             <hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb" />
-            <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service</p>
+            <p style="color:#6b7280;font-size:12px;">Republic of Guinea – E‑Visa Service (Testing Mode)</p>
           `,
         })
         if (!(fallback as any).error) {
