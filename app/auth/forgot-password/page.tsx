@@ -14,16 +14,17 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     if (sending) return
     setSending(true)
+    setMessage(null)
     try {
-      // Use production URL for deployed version, fallback to current origin for development
-      const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('localhost')
-      const baseUrl = isProduction ? 'https://hci-sable-six.vercel.app' : window.location.origin
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${baseUrl}/auth/update-password`,
+      const origin = window.location.origin
+      const res = await fetch('/api/auth/send-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, siteOrigin: origin }),
       })
-      if (error) {
-        setMessage(error.message)
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        setMessage(j.error || 'Failed to send reset email')
       } else {
         setMessage('Check your email for a password reset link.')
       }
