@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,21 +9,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Generate password recovery link - Supabase will send email if SMTP is configured
-    const supabaseAdmin = getSupabaseAdmin()
-    const { error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'recovery',
-      email,
-      options: { redirectTo: `${siteOrigin}/auth/update-password` },
+    // Use Supabase's built-in password reset functionality
+    const supabase = await createClient()
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${siteOrigin}/auth/update-password`,
     })
 
-    if (linkErr) {
-      console.error('send-reset: generateLink error', linkErr)
-      return NextResponse.json({ error: linkErr.message }, { status: 400 })
+    if (error) {
+      console.error('send-reset: resetPasswordForEmail error', error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     return NextResponse.json({ ok: true })
   } catch (err: any) {
+    console.error('send-reset: unexpected error', err)
     return NextResponse.json({ error: err.message || 'Unexpected error' }, { status: 500 })
   }
 }

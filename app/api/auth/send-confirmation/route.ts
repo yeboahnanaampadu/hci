@@ -8,9 +8,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Generate signup link - Supabase will send email if SMTP is configured
+    // Create user with Supabase - this will automatically send confirmation email
     const supabaseAdmin = getSupabaseAdmin()
-    const { error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
+    const { data, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: false, // User must confirm email
+      user_metadata: full_name ? { full_name } : undefined,
+    })
+
+    if (createErr) {
+      console.error('send-confirmation: createUser error', createErr)
+      return NextResponse.json({ error: createErr.message }, { status: 400 })
+    }
+
+    // Generate confirmation link for the created user
+    const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
       type: 'signup',
       email,
       password,
@@ -19,10 +32,15 @@ export async function POST(req: NextRequest) {
         redirectTo: `${siteOrigin}/auth/confirm`,
       },
     })
-    if (linkErr) return NextResponse.json({ error: linkErr.message }, { status: 400 })
+
+    if (linkErr) {
+      console.error('send-confirmation: generateLink error', linkErr)
+      return NextResponse.json({ error: linkErr.message }, { status: 400 })
+    }
 
     return NextResponse.json({ ok: true })
   } catch (err: any) {
+    console.error('send-confirmation: unexpected error', err)
     return NextResponse.json({ error: err.message || 'Unexpected error' }, { status: 500 })
   }
 }
