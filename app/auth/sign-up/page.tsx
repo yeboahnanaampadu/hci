@@ -17,11 +17,10 @@ export default function SignUpPage() {
     e.preventDefault()
     setLoading(true)
     setMessage(null)
-    const origin = window.location.origin
     const res = await fetch('/api/auth/send-confirmation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, full_name: name, siteOrigin: origin }),
+      body: JSON.stringify({ email, password, full_name: name }),
     })
     setLoading(false)
     if (!res.ok) {

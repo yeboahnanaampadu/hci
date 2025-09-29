@@ -3,10 +3,13 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, full_name, siteOrigin } = await req.json()
-    if (!email || !password || !siteOrigin) {
+    const { email, password, full_name } = await req.json()
+    if (!email || !password) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
+
+    // Get production URL from environment variable
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hci-sable-six.vercel.app'
 
     // Create user with Supabase - this will automatically send confirmation email
     const supabaseAdmin = getSupabaseAdmin()
@@ -29,7 +32,7 @@ export async function POST(req: NextRequest) {
       password,
       options: {
         data: full_name ? { full_name } : undefined,
-        redirectTo: `${siteOrigin}/auth/confirm`,
+        redirectTo: `${siteUrl}/auth/confirm`,
       },
     })
 

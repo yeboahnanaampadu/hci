@@ -16,11 +16,10 @@ export default function ForgotPasswordPage() {
     setSending(true)
     setMessage(null)
     try {
-      const origin = window.location.origin
       const res = await fetch('/api/auth/send-reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, siteOrigin: origin }),
+        body: JSON.stringify({ email }),
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))

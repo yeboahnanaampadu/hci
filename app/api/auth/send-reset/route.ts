@@ -3,16 +3,19 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, siteOrigin } = await req.json()
-    if (!email || !siteOrigin) {
-      console.error('send-reset: missing fields', { hasEmail: !!email, hasSiteOrigin: !!siteOrigin })
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    const { email } = await req.json()
+    if (!email) {
+      console.error('send-reset: missing email', { hasEmail: !!email })
+      return NextResponse.json({ error: 'Missing email' }, { status: 400 })
     }
+
+    // Get production URL from environment variable
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hci-sable-six.vercel.app'
 
     // Use Supabase's built-in password reset functionality
     const supabase = await createClient()
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteOrigin}/auth/update-password`,
+      redirectTo: `${siteUrl}/auth/update-password`,
     })
 
     if (error) {
