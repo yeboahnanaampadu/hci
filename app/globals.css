@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base */
+:root { --radius: 14px; }
+body { @apply bg-gray-50 text-gray-900 antialiased; }
+
+/* Reusable UI */
+.container-prose { @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8; }
+
+.card { @apply rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-6; }
+
+.btn { @apply inline-flex items-center justify-center rounded-lg font-medium px-5 py-2.5 transition shadow-sm; }
+.btn-primary { @apply bg-[#F1C232] text-black hover:brightness-95; }
+.btn-outline { @apply border border-white/70 text-white hover:bg-white/10; }
+
+/* Landing-specific accents */
+.card-accent-yellow { @apply border-l-4 border-yellow-400; }
+.card-accent-red    { @apply border-l-4 border-red-500; }
+.card-accent-green  { @apply border-l-4 border-emerald-500; }
+
+.bullet { @apply flex items-center gap-2 text-sm text-gray-800; }
+.bullet::before { content: ""; @apply inline-block size-2 rounded-full bg-emerald-500; }
+
+.btn-hero-primary { @apply bg-[#F1C232] text-black border border-[#E5B72E] hover:brightness-95; }
+.btn-hero-outline { @apply border border-white text-white hover:bg-white/10; }
+
+.hero-wrap { background: linear-gradient(90deg,#0e7a2a 0%, #137c34 40%, #0a8f4a 100%); }
+.cta-wrap  { background: linear-gradient(90deg,#f1c232 0%, #d3a51d 100%); }
+
+.icon-circle { @apply size-10 rounded-full grid place-items-center bg-yellow-100 ring-1 ring-yellow-300; }
