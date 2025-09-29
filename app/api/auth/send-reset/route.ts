@@ -46,10 +46,9 @@ export async function POST(req: NextRequest) {
       const err = (sendResult as any).error
       lastError = err
       console.error('Resend send error:', err)
-      // If domain is not verified, retry once via Resend's verified onboarding sender
-      if (attempt === 0 && (err?.statusCode === 403 || err?.name === 'validation_error')) {
+      if (attempt === 0) {
         const fallback = await resend.emails.send({
-          from: 'Guinea E‑Visa <onboarding@resend.dev>',
+          from: 'onboarding@resend.dev',
           to: email,
           subject: 'Guinea E‑Visa – Reset your password',
           html: `
