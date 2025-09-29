@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import AuthCard from '@/components/AuthCard'
 import { createClient } from '@/lib/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 export default function ConfirmPage() {
   const params = useSearchParams()
   const router = useRouter()

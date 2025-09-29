@@ -5,6 +5,8 @@ import AuthCard from '@/components/AuthCard'
 import { useLanguage } from '@/lib/LanguageContext'
 import { createClient } from '@/lib/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 export default function PaymentPage() {
   const { language } = useLanguage()
   const params = useSearchParams()
