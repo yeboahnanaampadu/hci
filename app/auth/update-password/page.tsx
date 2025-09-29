@@ -1,13 +1,13 @@
 
 'use client'
-import { useEffect, useState, FormEvent } from 'react'
+import { Suspense, useEffect, useState, FormEvent } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import AuthCard from '@/components/AuthCard'
 import { createClient } from '@/lib/supabase/client'
 
 export const dynamic = 'force-dynamic'
 
-export default function UpdatePasswordPage() {
+function UpdatePasswordContent() {
   const supabase = createClient()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -50,5 +50,13 @@ export default function UpdatePasswordPage() {
         {message && <p className="text-sm">{message}</p>}
       </form>
     </AuthCard>
+  )
+}
+
+export default function UpdatePasswordPage() {
+  return (
+    <Suspense fallback={<AuthCard title="Set a new password"><p className="text-sm">Loading...</p></AuthCard>}>
+      <UpdatePasswordContent />
+    </Suspense>
   )
 }

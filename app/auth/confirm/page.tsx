@@ -1,13 +1,13 @@
 
 'use client'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import AuthCard from '@/components/AuthCard'
 import { createClient } from '@/lib/supabase/client'
 
 export const dynamic = 'force-dynamic'
 
-export default function ConfirmPage() {
+function ConfirmContent() {
   const params = useSearchParams()
   const router = useRouter()
   const [msg, setMsg] = useState('Confirming...')
@@ -37,5 +37,13 @@ export default function ConfirmPage() {
     <AuthCard title="Confirming your email">
       <p className="text-sm">{msg}</p>
     </AuthCard>
+  )
+}
+
+export default function ConfirmPage() {
+  return (
+    <Suspense fallback={<AuthCard title="Confirming your email"><p className="text-sm">Loading...</p></AuthCard>}>
+      <ConfirmContent />
+    </Suspense>
   )
 }

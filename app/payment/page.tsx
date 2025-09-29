@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AuthCard from '@/components/AuthCard'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export const dynamic = 'force-dynamic'
 
-export default function PaymentPage() {
+function PaymentContent() {
   const { language } = useLanguage()
   const params = useSearchParams()
   const supabase = createClient()
@@ -123,5 +123,13 @@ export default function PaymentPage() {
         </button>
       </form>
     </AuthCard>
+  )
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<AuthCard title="Loading"><p>Loading...</p></AuthCard>}>
+      <PaymentContent />
+    </Suspense>
   )
 }
