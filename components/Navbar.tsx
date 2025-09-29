@@ -55,7 +55,7 @@ export default function Navbar() {
           </div>
         </nav>
         {/* Mobile Menu Button */}
-        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-gray-700 hover:text-gray-900">
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu" className="md:hidden text-gray-700 hover:text-gray-900">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
           </svg>
@@ -72,9 +72,9 @@ export default function Navbar() {
             )}
             <Link href={user ? "/dashboard" : "/"} className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Home' : 'Accueil'}</Link>
             <Link href="/retrieve-pay" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Retrieve & Pay' : 'Récupérer & Payer'}</Link>
-            <div className="flex gap-2">
-              <button onClick={() => { setLanguage('en'); setDropdownOpen(false); setMobileMenuOpen(false); }} className="text-gray-700 hover:text-gray-900">English</button>
-              <button onClick={() => { setLanguage('fr'); setDropdownOpen(false); setMobileMenuOpen(false); }} className="text-gray-700 hover:text-gray-900">Français</button>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => { setLanguage('en'); setDropdownOpen(false); setMobileMenuOpen(false); }} className="btn border w-full xs:w-auto">English</button>
+              <button onClick={() => { setLanguage('fr'); setDropdownOpen(false); setMobileMenuOpen(false); }} className="btn border w-full xs:w-auto">Français</button>
             </div>
           </div>
         </div>

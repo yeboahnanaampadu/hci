@@ -7,8 +7,8 @@ export function getResend() {
 }
 
 export function getDefaultFromEmail() {
-  // Build a friendly From header like: "Guinea E‑Visa <no-reply@guinea-evisa.gov.gn>"
-  const email = process.env.EMAIL_FROM || 'no-reply@guinea-evisa.gov.gn'
+  // Build a friendly From header like: "Guinea E‑Visa <onboarding@resend.dev>"
+  const email = process.env.EMAIL_FROM || 'onboarding@resend.dev'
   const name = process.env.EMAIL_FROM_NAME || 'Guinea E‑Visa'
   return `${name} <${email}>`
 }
