@@ -15,8 +15,12 @@ export default function ForgotPasswordPage() {
     if (sending) return
     setSending(true)
     try {
+      // Use production URL for deployed version, fallback to current origin for development
+      const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('localhost')
+      const baseUrl = isProduction ? 'https://hci-sable-six.vercel.app' : window.location.origin
+
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+        redirectTo: `${baseUrl}/auth/update-password`,
       })
       if (error) {
         setMessage(error.message)

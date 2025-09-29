@@ -37,11 +37,15 @@ export default function SignInPage() {
     setResendLoading(true)
     setMessage(null)
     try {
+      // Use production URL for deployed version, fallback to current origin for development
+      const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('localhost')
+      const baseUrl = isProduction ? 'https://hci-sable-six.vercel.app' : window.location.origin
+
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`
+          emailRedirectTo: `${baseUrl}/auth/confirm`
         }
       })
       if (error) {
