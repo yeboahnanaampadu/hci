@@ -1,38 +1,13 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
   const { language, setLanguage } = useLanguage()
-  const router = useRouter()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
-  const supabase = createClient()
-
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-    }
-    checkUser()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
@@ -46,46 +21,10 @@ export default function Navbar() {
         </Link>
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
-            {user ? (
-              <>
-                <span className="text-gray-700">{user.email}</span>
-                <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Dashboard' : 'Tableau de bord'}</Link>
-                <div className="relative">
-                  <button
-                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="text-gray-700 hover:text-gray-900 flex items-center gap-1"
-                  >
-                    {language === 'en' ? 'Menu' : 'Menu'}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
-                      <Link href="/dashboard" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                        {language === 'en' ? 'Dashboard' : 'Tableau de bord'}
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600"
-                      >
-                        {language === 'en' ? 'Sign Out' : 'Se déconnecter'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/sign-in" className="text-gray-700 hover:text-gray-900">
-                  {language === 'en' ? 'Sign In' : 'Se connecter'}
-                </Link>
-                <Link href="/auth/sign-up" className="btn bg-guinea-green text-white">
-                  {language === 'en' ? 'Sign Up' : 'S\'inscrire'}
-                </Link>
-              </>
-            )}
-           <div className="relative">
+          <span className="text-gray-700">{language === 'en' ? 'Hello there' : 'Bonjour'}</span>
+          <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Home' : 'Accueil'}</Link>
+          <Link href="/retrieve-pay" className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Retrieve & Pay' : 'Récupérer & Payer'}</Link>
+          <div className="relative">
             <button onClick={() => setDropdownOpen(!dropdownOpen)} className="text-gray-700 hover:text-gray-900 flex items-center gap-1">
               {language === 'en' ? 'English' : 'Français'}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,29 +50,9 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100">
           <div className="container-prose py-4 space-y-4">
-            {user ? (
-              <>
-                <span className="block text-gray-700">{user.email}</span>
-                <Link href="/dashboard" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>
-                  {language === 'en' ? 'Dashboard' : 'Tableau de bord'}
-                </Link>
-                <button
-                  onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
-                  className="block w-full text-left text-red-600 hover:text-red-800"
-                >
-                  {language === 'en' ? 'Sign Out' : 'Se déconnecter'}
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/sign-in" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>
-                  {language === 'en' ? 'Sign In' : 'Se connecter'}
-                </Link>
-                <Link href="/auth/sign-up" className="btn bg-guinea-green text-white w-full text-center" onClick={() => setMobileMenuOpen(false)}>
-                  {language === 'en' ? 'Sign Up' : 'S\'inscrire'}
-                </Link>
-              </>
-            )}
+            <span className="block text-gray-700">{language === 'en' ? 'Hello there' : 'Bonjour'}</span>
+            <Link href="/dashboard" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Home' : 'Accueil'}</Link>
+            <Link href="/retrieve-pay" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Retrieve & Pay' : 'Récupérer & Payer'}</Link>
             <div className="flex flex-wrap gap-2">
               <button onClick={() => { setLanguage('en'); setDropdownOpen(false); setMobileMenuOpen(false); }} className="btn border w-full xs:w-auto">English</button>
               <button onClick={() => { setLanguage('fr'); setDropdownOpen(false); setMobileMenuOpen(false); }} className="btn border w-full xs:w-auto">Français</button>

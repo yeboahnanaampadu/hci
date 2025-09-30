@@ -4,32 +4,16 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/lib/LanguageContext'
-import { useRouter } from 'next/navigation'
 
 export default function DashboardPage() {
   const { language } = useLanguage()
-  const router = useRouter()
   const [applications, setApplications] = useState<any[]>([])
   const [canceling, setCanceling] = useState<string | null>(null)
   const [cancelReason, setCancelReason] = useState('')
-  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    checkUser()
     loadApplications()
   }, [])
-
-  const checkUser = async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-  }
-
-  const handleSignOut = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/')
-  }
 
   const loadApplications = async () => {
     const supabase = createClient()
@@ -104,20 +88,7 @@ export default function DashboardPage() {
   return (
     <main className="container-prose my-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">{language === 'en' ? 'Welcome to Guinea E-Visa' : 'Bienvenue sur Guinea E-Visa'}</h1>
-          {user && (
-            <p className="text-sm text-gray-600 mt-1">
-              Signed in as: {user.email}
-            </p>
-          )}
-        </div>
-        <button
-          onClick={handleSignOut}
-          className="btn bg-gray-600 text-white w-full sm:w-auto"
-        >
-          {t[language].signOut}
-        </button>
+        <h1 className="text-2xl font-bold">{language === 'en' ? 'Welcome to Guinea E-Visa' : 'Bienvenue sur Guinea E-Visa'}</h1>
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-6">
