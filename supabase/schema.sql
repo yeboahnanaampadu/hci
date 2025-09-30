@@ -167,7 +167,7 @@ create or replace function public.create_application(
   p_email text,
   p_travel_start date,
   p_travel_end date
-) returns void as $$
+) returns uuid as $$
 declare
   app_id uuid;
   amount numeric(10,2);
@@ -181,14 +181,16 @@ begin
 
   -- Create application for authenticated user
   insert into public.applications (user_id, visa_type, travel_start, travel_end, amount_usd, status)
-   values (auth.uid(), p_visa_type, p_travel_start, p_travel_end, amount, 'payment_pending')
+   values (auth.uid(), p_visa_type, p_travel_start, p_travel_end, amount, 'draft')
     returning id into app_id;
 
   insert into public.applicants (application_id, given_names, surname, passport_number, email)
     values (app_id, p_given_names, p_surname, p_passport_number, p_email);
 
   insert into public.application_status_history (application_id, status, note)
-    values (app_id, 'payment_pending', 'Application created, pending payment');
+    values (app_id, 'draft', 'Application created as draft');
+
+  return app_id;
 end;
 $$ language plpgsql security definer;
 

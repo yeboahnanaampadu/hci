@@ -58,14 +58,15 @@ export default function StartApplicationPage() {
       p_travel_end: form.travel_end
     }
     console.log('RPC params:', params)
-    const { error, data } = await supabase.rpc('create_application', params)
+    const { data, error } = await supabase.rpc('create_application', params)
     if (error) {
       console.error('RPC error:', error)
       setError(error.message)
       return
     }
-    // The function returns void, but we can get the reference number from the inserted application
-    // For now, redirect to dashboard
+
+    console.log('Application created successfully, ID:', data)
+    // Redirect to dashboard to see the new application
     router.replace('/dashboard')
   }
 
