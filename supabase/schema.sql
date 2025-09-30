@@ -31,14 +31,14 @@ create table if not exists public.profiles (
 -- Applications
 create table if not exists public.applications (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete cascade not null, -- Require authenticated user
   reference_number text unique,
   visa_type visa_type not null,
   purpose text,
   travel_start date,
   travel_end date,
   amount_usd numeric(10,2),
-  status app_status not null default 'submitted',
+  status app_status not null default 'draft',
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -125,6 +125,7 @@ alter table public.application_status_history enable row level security;
 create policy "profiles owner access" on public.profiles
   for all using (id = auth.uid()) with check (id = auth.uid());
 
+-- Enable proper RLS policies for authenticated users
 create policy "applications owner select" on public.applications
   for select using (user_id = auth.uid());
 create policy "applications owner modify" on public.applications
@@ -134,13 +135,18 @@ create policy "applications owner update" on public.applications
 create policy "applications owner delete" on public.applications
   for delete using (user_id = auth.uid());
 
+-- Enable owner-based policies for applicants
 create policy "applicants by owner" on public.applicants
   for all using (application_id in (select id from public.applications where user_id = auth.uid()))
   with check (application_id in (select id from public.applications where user_id = auth.uid()));
 
-create policy "public select applicants" on public.applicants
-  for select using (true);
+-- Remove anonymous access policies
+drop policy if exists "applications anonymous access" on public.applications;
+drop policy if exists "applicants anonymous access" on public.applicants;
+drop policy if exists "public select applicants" on public.applicants;
+drop policy if exists "status history anonymous access" on public.application_status_history;
 
+-- Enable proper owner-based policies for all tables
 create policy "documents by owner" on public.documents
   for all using (application_id in (select id from public.applications where user_id = auth.uid()))
   with check (application_id in (select id from public.applications where user_id = auth.uid()));
@@ -173,15 +179,16 @@ begin
     else amount := 0.00;
   end case;
 
+  -- Create application for authenticated user
   insert into public.applications (user_id, visa_type, travel_start, travel_end, amount_usd, status)
    values (auth.uid(), p_visa_type, p_travel_start, p_travel_end, amount, 'payment_pending')
-   returning id into app_id;
+    returning id into app_id;
 
- insert into public.applicants (application_id, given_names, surname, passport_number, email)
-   values (app_id, p_given_names, p_surname, p_passport_number, p_email);
+  insert into public.applicants (application_id, given_names, surname, passport_number, email)
+    values (app_id, p_given_names, p_surname, p_passport_number, p_email);
 
- insert into public.application_status_history (application_id, status, note)
-   values (app_id, 'payment_pending', 'Application created, pending payment');
+  insert into public.application_status_history (application_id, status, note)
+    values (app_id, 'payment_pending', 'Application created, pending payment');
 end;
 $$ language plpgsql security definer;
 

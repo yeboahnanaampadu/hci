@@ -16,13 +16,36 @@ function UpdatePasswordContent() {
   const router = useRouter()
 
   useEffect(() => {
-    const code = params.get('code')
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) setMessage(error.message)
+    const accessToken = params.get('access_token')
+    const refreshToken = params.get('refresh_token')
+    const type = params.get('type')
+
+    if (accessToken && refreshToken && type === 'recovery') {
+      // Set the session using the tokens from the password reset email
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      }).then(({ error }) => {
+        if (error) {
+          console.error('Session error:', error)
+          setMessage(`Session error: ${error.message}`)
+        } else {
+          setMessage('Session established. You can now set a new password.')
+        }
       })
+    } else if (params.get('code')) {
+      // Handle PKCE flow if needed
+      const code = params.get('code')
+      if (code) {
+        supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+          if (error) {
+            console.error('Code exchange error:', error)
+            setMessage(`Code exchange error: ${error.message}`)
+          }
+        })
+      }
     }
-  }, [])
+  }, [params, supabase.auth])
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()

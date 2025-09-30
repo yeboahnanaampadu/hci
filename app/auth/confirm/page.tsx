@@ -14,24 +14,46 @@ function ConfirmContent() {
   const supabase = createClient()
 
   useEffect(() => {
-    console.log('params:', params, 'type:', typeof params)
     if (!params) {
       setMsg('No parameters found.')
       return
     }
+
     const code = params.get('code')
-    console.log('code:', code)
+    const error = params.get('error')
+    const errorDescription = params.get('error_description')
+
     ;(async () => {
+      if (error) {
+        setMsg(`Confirmation error: ${errorDescription || error}`)
+        return
+      }
+
       if (code) {
-        // Since exchangeCodeForSession fails due to missing code verifier,
-        // assume email is confirmed and redirect to sign in
-        setMsg('Email confirmed! Redirecting to sign in...')
-        setTimeout(() => router.replace('/auth/sign-in'), 1500)
+        try {
+          // Handle the email confirmation
+          const { data, error: confirmError } = await supabase.auth.verifyOtp({
+            token_hash: code,
+            type: 'email'
+          })
+
+          if (confirmError) {
+            console.error('Confirmation error:', confirmError)
+            setMsg(`Confirmation failed: ${confirmError.message}`)
+          } else {
+            setMsg('Email confirmed! Redirecting to sign in...')
+            setTimeout(() => router.replace('/auth/sign-in'), 1500)
+          }
+        } catch (err) {
+          console.error('Unexpected confirmation error:', err)
+          setMsg('Confirmation failed. Please try signing in.')
+          setTimeout(() => router.replace('/auth/sign-in'), 1500)
+        }
       } else {
         setMsg('Invalid confirmation link.')
       }
     })()
-  }, [params])
+  }, [params, supabase.auth])
 
   return (
     <AuthCard title="Confirming your email">
