@@ -9,16 +9,6 @@ export default function Navbar() {
   const { language, setLanguage } = useLanguage()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const supabase = createClient()
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
@@ -32,12 +22,8 @@ export default function Navbar() {
         </Link>
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
-           {user ? (
-             <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Welcome' : 'Bienvenue'}, {user.user_metadata?.full_name || user.email}</Link>
-           ) : (
-             <Link href="/auth/sign-in" className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Sign In' : 'Se Connecter'}</Link>
-           )}
-           <Link href={user ? "/dashboard" : "/"} className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Home' : 'Accueil'}</Link>
+           <span className="text-gray-700">{language === 'en' ? 'Hello there' : 'Bonjour'}</span>
+           <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Home' : 'Accueil'}</Link>
            <Link href="/retrieve-pay" className="text-gray-700 hover:text-gray-900">{language === 'en' ? 'Retrieve & Pay' : 'Récupérer & Payer'}</Link>
            <div className="relative">
             <button onClick={() => setDropdownOpen(!dropdownOpen)} className="text-gray-700 hover:text-gray-900 flex items-center gap-1">
@@ -65,12 +51,8 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100">
           <div className="container-prose py-4 space-y-4">
-            {user ? (
-              <Link href="/dashboard" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Welcome' : 'Bienvenue'}, {user.user_metadata?.full_name || user.email}</Link>
-            ) : (
-              <Link href="/auth/sign-in" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Sign In' : 'Se Connecter'}</Link>
-            )}
-            <Link href={user ? "/dashboard" : "/"} className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Home' : 'Accueil'}</Link>
+            <span className="block text-gray-700">{language === 'en' ? 'Hello there' : 'Bonjour'}</span>
+            <Link href="/dashboard" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Home' : 'Accueil'}</Link>
             <Link href="/retrieve-pay" className="block text-gray-700 hover:text-gray-900" onClick={() => setMobileMenuOpen(false)}>{language === 'en' ? 'Retrieve & Pay' : 'Récupérer & Payer'}</Link>
             <div className="flex flex-wrap gap-2">
               <button onClick={() => { setLanguage('en'); setDropdownOpen(false); setMobileMenuOpen(false); }} className="btn border w-full xs:w-auto">English</button>

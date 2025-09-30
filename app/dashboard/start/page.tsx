@@ -9,7 +9,7 @@ import * as mrz from 'mrz'
 export default function StartApplicationPage() {
   const supabase = createClient()
   const router = useRouter()
-  const [form, setForm] = useState({ visa_type: 'tourist', given_names: '', surname: '', passport_number: '', travel_start: '', travel_end: '' })
+  const [form, setForm] = useState({ visa_type: 'tourist', given_names: '', surname: '', passport_number: '', email: '', travel_start: '', travel_end: '' })
   const [error, setError] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
@@ -46,15 +46,14 @@ export default function StartApplicationPage() {
     e.preventDefault()
     setError(null)
     if (!selectedFile) return setError('Please upload your ID card image.')
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return setError('Not signed in.')
+    if (!form.email) return setError('Email is required.')
     console.log('Submitting application with form data:', form)
     const params = {
       p_visa_type: form.visa_type,
       p_given_names: form.given_names,
       p_surname: form.surname,
       p_passport_number: form.passport_number,
-      p_email: user.email,
+      p_email: form.email,
       p_travel_start: form.travel_start,
       p_travel_end: form.travel_end
     }
@@ -75,6 +74,10 @@ export default function StartApplicationPage() {
       <div className="mx-auto max-w-2xl card">
         <h1 className="text-xl font-semibold">Start a new application</h1>
         <form onSubmit={onSubmit} className="mt-6 grid sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium">Email</label>
+            <input type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" required/>
+          </div>
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium">Visa type</label>
             <select value={form.visa_type} onChange={e=>setForm({...form, visa_type: e.target.value})} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">

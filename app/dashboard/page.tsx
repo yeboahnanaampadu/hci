@@ -7,17 +7,11 @@ import { useLanguage } from '@/lib/LanguageContext'
 
 export default function DashboardPage() {
   const { language } = useLanguage()
-  const [user, setUser] = useState<any>(null)
   const [applications, setApplications] = useState<any[]>([])
   const [canceling, setCanceling] = useState<string | null>(null)
   const [cancelReason, setCancelReason] = useState('')
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) window.location.href = '/auth/sign-in'
-      else setUser(user)
-    })
     loadApplications()
   }, [])
 
@@ -36,7 +30,7 @@ export default function DashboardPage() {
   const cancelApplication = async (id: string) => {
     if (!cancelReason.trim()) return alert('Please provide a reason.')
     const supabase = createClient()
-    console.log('Cancelling application id:', id, 'user id:', user.id)
+    console.log('Cancelling application id:', id)
     const { data, error } = await supabase
       .from('applications')
       .update({ status: 'rejected' })
@@ -91,22 +85,10 @@ export default function DashboardPage() {
     }
   }
 
-  if (!user) return <div>Loading...</div>
-
   return (
     <main className="container-prose my-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="text-2xl font-bold">{t[language].welcome}, {user.user_metadata?.full_name || 'Applicant'}</h1>
-        <button
-          onClick={async () => {
-            const supabase = createClient()
-            await supabase.auth.signOut()
-            window.location.href = '/auth/sign-in'
-          }}
-          className="btn border border-gray-300 w-full sm:w-auto"
-        >
-          {t[language].signOut}
-        </button>
+        <h1 className="text-2xl font-bold">{language === 'en' ? 'Welcome to Guinea E-Visa' : 'Bienvenue sur Guinea E-Visa'}</h1>
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-6">
